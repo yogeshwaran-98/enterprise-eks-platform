@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service
+  namespace: enterprise
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: orders-service
+
+  template:
+    metadata:
+      labels:
+        app: orders-service
+
+    spec:
+      containers:
+        - name: orders
+
+          image: 106551436513.dkr.ecr.ap-south-1.amazonaws.com/orders-service:latest
+
+          ports:
+            - containerPort: 8000
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:u
+              cpu: "500m"
+              memory: "512Mi"
