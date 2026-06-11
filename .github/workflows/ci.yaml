@@ -24,8 +24,8 @@ jobs:
           pip install pytest httpx
 
       - name: Run Tests
+        working-directory: apps/users-service
         run: |
-          cd apps/users-service
           pytest
 
 # name: Build-Test-Scan-Push-HelmUpdate
