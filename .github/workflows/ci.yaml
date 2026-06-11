@@ -1,77 +1,108 @@
-name: Build-Test-Scan-Push-HelmUpdate
+name: Build-Test
 
 on:
   push:
     branches:
       - main
 
-env:
-  AWS_REGION: ap-south-1
-  ECR_REPOSITORY: users-service
-  IMAGE_NAME: users-service
-  ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          python-version: "3.11"
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build Docker Image
+      - name: Install Dependencies
         run: |
-          docker build \
-            -t $IMAGE_NAME:${{ github.sha }} \
-            ./apps/users-service
-
-      - name: Trivy Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          severity: CRITICAL,HIGH
-          exit-code: 1
-
-      - name: Tag Docker Image
-        run: |
-          docker tag $IMAGE_NAME:${{ github.sha }} \
-            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:${{ github.sha }}
-
-      - name: Push Docker Image to ECR
-        run: |
-          docker push \
-            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:${{ github.sha }}
+          pip install -r apps/users-service/requirements.txt
+          pip install pytest httpx
 
       - name: Run Tests
         run: |
-          pip install -r apps/users-service/requirements.txt
-          pip install pytest
-          pytest apps/users-service || true
+          cd apps/users-service
+          pytest
 
-      - name: Install yq
-        run: |
-          sudo wget -O /usr/bin/yq \
-            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod +x /usr/bin/yq
+# name: Build-Test-Scan-Push-HelmUpdate
 
-      - name: Update Helm Image Tag
-        run: |
-          yq -i '.image.tag = "${{ github.sha }}"' helm/users-service/values.yaml
+# on:
+#   push:
+#     branches:
+#       - main
 
-      - name: Commit Helm Changes
-        run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "github-actions"
-          git add helm/users-service/values.yaml
-          git commit -m "Update image tag ${{ github.sha }}" || echo "No changes"
-          git push
+# env:
+#   AWS_REGION: ap-south-1
+#   ECR_REPOSITORY: users-service
+#   IMAGE_NAME: users-service
+#   ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Configure AWS Credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Build Docker Image
+#         run: |
+#           docker build \
+#             -t $IMAGE_NAME:${{ github.sha }} \
+#             ./apps/users-service
+
+#       - name: Trivy Scan
+#         uses: aquasecurity/trivy-action@master
+#         with:
+#           image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+#           severity: CRITICAL,HIGH
+#           exit-code: 1
+
+#       - name: Tag Docker Image
+#         run: |
+#           docker tag $IMAGE_NAME:${{ github.sha }} \
+#             $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:${{ github.sha }}
+
+#       - name: Push Docker Image to ECR
+#         run: |
+#           docker push \
+#             $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:${{ github.sha }}
+
+#       - name: Run Tests
+#         run: |
+#           pip install -r apps/users-service/requirements.txt
+#           pip install pytest
+#           pytest apps/users-service || true
+
+#       - name: Install yq
+#         run: |
+#           sudo wget -O /usr/bin/yq \
+#             https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+#           sudo chmod +x /usr/bin/yq
+
+#       - name: Update Helm Image Tag
+#         run: |
+#           yq -i '.image.tag = "${{ github.sha }}"' helm/users-service/values.yaml
+
+#       - name: Commit Helm Changes
+#         run: |
+#           git config user.email "github-actions@github.com"
+#           git config user.name "github-actions"
+#           git add helm/users-service/values.yaml
+#           git commit -m "Update image tag ${{ github.sha }}" || echo "No changes"
+#           git push
+
