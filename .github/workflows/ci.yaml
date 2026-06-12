@@ -30,6 +30,39 @@ jobs:
           ls -la
           python -m pytest -v
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t users-service:${{ github.sha }} \
+            ./apps/users-service
+
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: users-service:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
+      - name: Tag Image
+        run: |
+          docker tag users-service:${{ github.sha }} \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/users-service:${{ github.sha }}
+
+      - name: Push Image
+        run: |
+          docker push \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/users-service:${{ github.sha }}
+
 # name: Build-Test-Scan-Push-HelmUpdate
 
 # on:
