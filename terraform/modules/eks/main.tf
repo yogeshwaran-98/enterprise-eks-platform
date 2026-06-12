@@ -8,6 +8,9 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
 
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
+
   eks_managed_node_groups = {
     default = {
       desired_size   = 2
@@ -19,6 +22,23 @@ module "eks" {
       capacity_type = "ON_DEMAND"
     }
   }
+
+  access_entries = {
+    admin = {
+      principal_arn = "arn:aws:iam::106551436513:root"
+
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
+
 
   tags = {
     Environment = "dev"
