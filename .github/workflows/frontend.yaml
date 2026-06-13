@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -49,7 +49,7 @@ jobs:
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/frontend:${{ github.sha }}
 
       - name: Checkout GitOps Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: yogeshwaran-98/enterprise-eks-gitops
           token: ${{ secrets.GITOPS_PAT }}
