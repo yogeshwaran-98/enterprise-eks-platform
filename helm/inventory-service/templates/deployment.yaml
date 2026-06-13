@@ -25,5 +25,10 @@ spec:
         ports:
         - containerPort: 8000
 
+      {{- if .Values.env }}
+          env:
+      {{ toYaml .Values.env | nindent 6 }}
+      {{- end }}
+
         resources:
-{{ toYaml .Values.resources | nindent 10 }}
+      {{ toYaml .Values.resources | nindent 10 }}
