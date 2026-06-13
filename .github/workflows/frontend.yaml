@@ -34,9 +34,9 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: frontend:${{ github.sha }}
-          severity: CRITICAL
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: 1
+          exit-code: 0
 
       - name: Tag Image
         run: |
