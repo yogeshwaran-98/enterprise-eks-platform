@@ -3,13 +3,17 @@ resource "aws_ecr_repository" "frontend" {
 }
 
 resource "aws_ecr_repository" "users" {
-  name = "users"
+  name = "users-service"
 }
 
 resource "aws_ecr_repository" "orders" {
-  name = "orders"
+  name = "orders-service"
 }
 
 resource "aws_ecr_repository" "payments" {
-  name = "payments"
+  name = "payments-service"
+}
+
+resource "aws_ecr_repository" "inventory" {
+  name = "inventory-service"
 }
