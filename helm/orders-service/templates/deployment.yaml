@@ -10,11 +10,13 @@ spec:
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
+      version: {{ .Values.version }}
 
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
+        version: {{ .Values.version }}
 
     spec:
       containers:
@@ -25,10 +27,7 @@ spec:
         ports:
         - containerPort: 8000
       
-      {{- if .Values.env }}
-          env:
-      {{ toYaml .Values.env | nindent 6 }}
-      {{- end }}
+      
 
         resources:
 {{ toYaml .Values.resources | nindent 10 }}

@@ -4,6 +4,8 @@ image:
   repository: 106551436513.dkr.ecr.us-east-1.amazonaws.com/payments-service
   tag: "latest"
 
+version: v1
+
 service:
   type: ClusterIP
   port: 80

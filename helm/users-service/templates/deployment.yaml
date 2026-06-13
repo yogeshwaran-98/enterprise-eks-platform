@@ -7,14 +7,16 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
 
-  selector:
+  sselector:
     matchLabels:
       app: {{ .Chart.Name }}
+      version: {{ .Values.version }}
 
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
+        version: {{ .Values.version }}
 
     spec:
       containers:
