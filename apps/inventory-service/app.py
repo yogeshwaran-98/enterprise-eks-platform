@@ -3,8 +3,8 @@ from fastapi import FastAPI
 app = FastAPI()
 
 inventory = [
-    {"item": "Laptop", "stock": 20},
-    {"item": "Keyboard", "stock": 50}
+    {"id": 1, "item": "Laptop", "stock": 10},
+    {"id": 2, "item": "Mouse", "stock": 50}
 ]
 
 @app.get("/")

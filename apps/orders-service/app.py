@@ -3,8 +3,8 @@ from fastapi import FastAPI
 app = FastAPI()
 
 orders = [
-    {"id": 1, "product": "Laptop"},
-    {"id": 2, "product": "Keyboard"}
+    {"id": 1, "item": "Laptop", "quantity": 1},
+    {"id": 2, "item": "Phone", "quantity": 2}
 ]
 
 @app.get("/")

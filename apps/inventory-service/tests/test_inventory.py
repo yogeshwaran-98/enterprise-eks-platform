@@ -3,7 +3,7 @@ from app import app
 
 client = TestClient(app)
 
-def test_payments():
+def test_inventory():
     response = client.get("/inventory")
 
     assert response.status_code == 200
