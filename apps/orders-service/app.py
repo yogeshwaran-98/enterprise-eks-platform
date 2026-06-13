@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+
 app = FastAPI()
+
+trace.set_tracer_provider(TracerProvider())
 
 orders = [
     {"id": 1, "item": "Laptop", "quantity": 1},
