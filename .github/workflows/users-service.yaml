@@ -64,6 +64,41 @@ jobs:
           docker push \
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/users-service:${{ github.sha }}
 
+      - name: Checkout GitOps Repo
+        uses: actions/checkout@v4
+        with:
+          repository: yogeshwaran-98/enterprise-eks-gitops
+          token: ${{ secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Install yq
+        run: |
+          sudo wget -O /usr/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/bin/yq
+
+      - name: Update image tag
+        run: |
+          yq -i '.image.tag = "${{ github.sha }}"' \
+          gitops/environments/production/users-service-values.yaml
+
+      - name: Commit GitOps Changes
+        run: |
+          cd gitops
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+
+          git diff --staged --quiet || \
+          git commit -m "Update users-service image to ${{ github.sha }}"
+
+      - name: Push GitOps Changes
+        run: |
+          cd gitops
+          git push
+
 # name: Build-Test-Scan-Push-HelmUpdate
 
 # on:
