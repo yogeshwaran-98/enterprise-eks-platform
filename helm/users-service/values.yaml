@@ -10,6 +10,11 @@ service:
   type: ClusterIP
   port: 80
 
+canary:
+  enabled: false
+  replicaCount: 1
+  tag: ""
+
 resources:
   requests:
     cpu: 100m
